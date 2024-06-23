@@ -1,0 +1,90 @@
+<html>
+  <style>
+    .container {
+      border: 5px solid black;
+      padding: 10px;
+    }
+  </style>
+  <body>
+    <div id="red"></div>
+    <div id="blue"></div>
+    <script type="module">
+      // npm i redux
+      // redux devtool (크롬 개발자 툴)
+      // redux extension (크롬 , firefox 등 버전이 많음) = https://github.com/zalmoxisus/redux-devtools-extension
+        /// -> basic store copy (window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());)
+
+      // Extension 툴
+      // 시간 여행이 가능함.. 어떤 state 가 바꼈는지, import , export 등을 통해서 state 를 바꿀 수도 있음
+
+      import { createStore } from "./node_modules/redux/dist/redux.mjs";
+
+      // 1번 state 컨테이너 가 있다. (리덕스.png 참조)
+
+      // 2번 reducer 를 사용해서 state 를 변경한다 (return 하면 state 쪽으로 감)
+
+      function reducer(state , action) {
+        console.log(state, action); // reducer 는 처음에 최초로 바로 실행됨 , state 는 undefined 가 됨
+        // 최초 초기화 단계
+        if (state === undefined) {
+          return { color: "yellow" };
+        }
+
+        // Object.assign({} , {name : 'egoing} , {city : 'seoul'}); // 객체 복제하는 함수
+        // state.type
+        var newState 
+        if (action.type === "CHANGE_COLOR") {
+          // state 를 복사해야한다.
+          newState = Object.assign({}, state, { color: action.color }); // state 복제
+          return newState;
+        }
+      }
+
+      // 3번. reducer 를 통해서 store 를 만든다
+      var store = createStore(reducer , window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+
+      // 4번. state 를 변경시키기 위해서는 action 을 사용해야한다.
+      function action_red() {
+        store.dispatch({ type: "CHANGE_COLOR", color: "red" });
+      }
+
+      function action_blue() {
+        store.dispatch({ type: "CHANGE_COLOR", color: "blue" });
+      }
+
+      // 5번. state 값이 바뀔 때 마다 red() 함수를 호출해야 한다면?
+      // subscribe 를 통해 등록을 시키면 된다.
+      store.subscribe(red);
+      store.subscribe(blue);
+
+      // 컴포넌트
+      function red() {
+        var state = store.getState(); // 현재 state
+        document.querySelector(
+          "#red"
+        ).innerHTML = `<div class="container" id="conponent_red" style="background-color: ${state.color}">
+            <h1>red</h1>
+            <input type="button" value="fire" id="button_red"/>
+          </div>`;
+
+        // Attach event listener after rendering
+        document.getElementById('button_red').onclick = action_red;
+      }
+      red();
+
+      function blue() {
+        var state = store.getState(); // 현재 state
+        document.querySelector(
+          "#blue"
+        ).innerHTML = `<div class="container" id="conponent_blue" style="background-color: ${state.color}">
+            <h1>blue</h1>
+            <input type="button" value="fire" id="button_blue"/>
+          </div>`;
+
+        // Attach event listener after rendering
+        document.getElementById('button_blue').onclick = action_blue;
+      }
+      blue();
+    </script>
+  </body>
+</html>
